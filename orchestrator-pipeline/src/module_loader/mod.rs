@@ -1,15 +1,33 @@
 extern crate libloading;
 
-use libloading::Library;
-
 use crate::module::Module;
 
-static mut LOADED_LIBRARIES: Vec<Library> = Vec::new();
+static mut LOADED_LIBRARIES: Vec<libloading::Library> = Vec::new();
 
-//TODO: Error handling
 pub fn load_module(path: &std::path::Path) -> Box<dyn Module> {
-    let lib = unsafe { Library::new(path).unwrap() };
-    let constructor: libloading::Symbol<fn() -> Box<dyn Module>> = unsafe { lib.get(b"create_module").unwrap() };
+    if !path.exists() {
+        panic!("Module library not found at: {:?}", path);
+    }
+
+    let extension = path.extension().unwrap_or_default();
+    if !is_shared_library(extension) {
+        panic!("Module library must be a shared library");
+    }
+
+    let lib = unsafe {
+        libloading::Library::new(path)
+            .unwrap_or_else(|e| panic!("Failed to load module library at {:?}: {}", path, e))
+    };
+
+    let constructor: libloading::Symbol<fn() -> Box<dyn Module>> = unsafe {
+        lib.get(b"create_module").unwrap_or_else(|e| {
+            panic!(
+                "A 'create_module'  constructor method was not \
+                found for the module. Error: {}", e
+            )
+        })
+    };
+
     let module = constructor();
 
     unsafe {
@@ -17,4 +35,19 @@ pub fn load_module(path: &std::path::Path) -> Box<dyn Module> {
     }
 
     module
+}
+
+#[cfg(target_os = "windows")]
+fn is_shared_library(extension: &std::ffi::OsStr) -> bool {
+    extension == "dll"
+}
+
+#[cfg(target_os = "macos")]
+fn is_shared_library(extension: &std::ffi::OsStr) -> bool {
+    extension == "dylib"
+}
+
+#[cfg(target_os = "linux")]
+fn is_shared_library(extension: &std::ffi::OsStr) -> bool {
+    extension == "so"
 }
