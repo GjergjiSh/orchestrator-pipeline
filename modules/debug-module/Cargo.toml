@@ -5,3 +5,6 @@ edition = "2021"
 
 [dependencies]
 orchestrator-pipeline = { path = "../../orchestrator-pipeline/"}
+
+[lib]
+crate-type = ["cdylib"]

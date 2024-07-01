@@ -1,3 +1,14 @@
 {
-  "files.exclude": { "/cargo.lock": true, "/target": true }
+  "files.exclude": {
+    "**/Cargo.lock": true,
+    "**/target/*.json": true,
+    "**/target/**/*.d": true,
+    "**/target/**/*.a": true,
+    "**/target/**/*.cargo-lock": true,
+    "**/target/**/*.rlib": true,
+    "**/target/debug/.fingerprint": true,
+    "**/target/debug/deps": true,
+    "**/target/debug/examples": true,
+    "**/target/debug/incremental": true
+  }
 }
