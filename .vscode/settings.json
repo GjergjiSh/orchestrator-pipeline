@@ -1,0 +1,3 @@
+{
+  "files.exclude": { "/cargo.lock": true, "/target": true }
+}
