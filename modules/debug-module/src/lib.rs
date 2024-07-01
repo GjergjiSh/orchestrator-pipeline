@@ -15,3 +15,8 @@ impl Module for DebugModule {
         dbg!(shared_data);
     }
 }
+
+#[no_mangle]
+pub extern "C" fn create_module() -> Box<dyn Module> {
+    Box::new(DebugModule::new())
+}

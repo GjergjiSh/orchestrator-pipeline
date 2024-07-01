@@ -6,3 +6,4 @@ edition = "2021"
 [dependencies]
 orchestrator-pipeline = { path = "../orchestrator-pipeline/" }
 debug-module = { path = "../modules/debug-module/" }
+libloading = "0.8"
