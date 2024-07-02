@@ -6,9 +6,17 @@
     "**/target/**/*.a": true,
     "**/target/**/*.cargo-lock": true,
     "**/target/**/*.rlib": true,
+    "**/target/**/*.exp": true,
+    "**/target/**/*.pdb": true,
+    "**/target/**/*.TAG": true,
+    "**/target/**/*.dll.lib": true,
     "**/target/debug/.fingerprint": true,
     "**/target/debug/deps": true,
     "**/target/debug/examples": true,
-    "**/target/debug/incremental": true
-  }
+    "**/target/debug/incremental": true,
+    "**/target/debug/build": true
+  },
+  "cSpell.words": [
+    "libloading"
+  ]
 }
