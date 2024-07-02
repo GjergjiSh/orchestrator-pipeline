@@ -35,11 +35,6 @@ fn _load_module(
         panic!("Module library not found at: {:?}", path);
     }
 
-    let extension = path.extension().unwrap_or_default();
-    if !_is_shared_library(extension) {
-        panic!("Module library must be a shared library");
-    }
-
     let lib = unsafe {
         libloading::Library::new(path)
             .unwrap_or_else(|e| panic!("Failed to load module library at {:?}: {}", path, e))
@@ -64,19 +59,4 @@ fn _load_module(
     }
 
     module
-}
-
-#[cfg(target_os = "windows")]
-fn _is_shared_library(extension: &std::ffi::OsStr) -> bool {
-    extension == "dll"
-}
-
-#[cfg(target_os = "macos")]
-fn _is_shared_library(extension: &std::ffi::OsStr) -> bool {
-    extension == "dylib"
-}
-
-#[cfg(target_os = "linux")]
-fn _is_shared_library(extension: &std::ffi::OsStr) -> bool {
-    extension == "so"
 }
