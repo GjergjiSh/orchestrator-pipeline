@@ -22,7 +22,7 @@ pub fn load_module(path: &std::path::Path) -> Box<dyn Module> {
     let constructor: libloading::Symbol<fn() -> Box<dyn Module>> = unsafe {
         lib.get(b"create_module").unwrap_or_else(|e| {
             panic!(
-                "A 'create_module'  constructor method was not \
+                "A 'create_module' constructor method was not \
                 found for the module. Error: {}", e
             )
         })
