@@ -1,0 +1,19 @@
+module_root: "./target/debug/"
+
+modules:
+  - name: Module1
+    parameters:
+      param1: value1
+      param2: value2
+      param3: value3
+
+  - name: Module2
+    parameters:
+      paramA: valueA
+      paramB: valueB
+
+  - name: Module3
+    parameters:
+      paramX: valueX
+      paramY: valueY
+      paramZ: valueZ
