@@ -1,11 +1,21 @@
 module_root: "./target/debug/"
 
 modules:
-  - name: Module1
+  - name: debug_module
     parameters:
-      param1: value1
-      param2: value2
-      param3: value3
+      debug_bool: true
+      debug_u8: 1
+      debug_u16: 2
+      debug_u32: 3
+      debug_u64: 4
+      debug_i8: 5
+      debug_i16: 6
+      debug_i32: 7
+      debug_i64: 8
+      debug_f32: 9.0
+      debug_f64: 10.0
+      debug_string: Hello World
+
 
   - name: Module2
     parameters:

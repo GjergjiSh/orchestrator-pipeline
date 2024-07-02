@@ -1,10 +1,11 @@
 extern crate libloading;
 
 use crate::module::Module;
+use std::collections::HashMap;
 
 static mut LOADED_LIBRARIES: Vec<libloading::Library> = Vec::new();
 
-pub fn load_module(path: &std::path::Path) -> Box<dyn Module> {
+pub fn load_module(path: &std::path::Path, parameters: &HashMap<String, String>) -> Box<dyn Module> {
     if !path.exists() {
         panic!("Module library not found at: {:?}", path);
     }
@@ -19,7 +20,7 @@ pub fn load_module(path: &std::path::Path) -> Box<dyn Module> {
             .unwrap_or_else(|e| panic!("Failed to load module library at {:?}: {}", path, e))
     };
 
-    let constructor: libloading::Symbol<fn() -> Box<dyn Module>> = unsafe {
+    let constructor: libloading::Symbol<unsafe extern "C" fn(&HashMap<String, String>) -> Box<dyn Module>> = unsafe {
         lib.get(b"create_module").unwrap_or_else(|e| {
             panic!(
                 "A 'create_module' constructor method was not \
@@ -28,7 +29,7 @@ pub fn load_module(path: &std::path::Path) -> Box<dyn Module> {
         })
     };
 
-    let module = constructor();
+    let module = unsafe { constructor(parameters) };
 
     unsafe {
         LOADED_LIBRARIES.push(lib);
