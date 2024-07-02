@@ -15,15 +15,3 @@ modules:
       debug_f32: 9.0
       debug_f64: 10.0
       debug_string: Hello World
-
-
-  - name: Module2
-    parameters:
-      paramA: valueA
-      paramB: valueB
-
-  - name: Module3
-    parameters:
-      paramX: valueX
-      paramY: valueY
-      paramZ: valueZ

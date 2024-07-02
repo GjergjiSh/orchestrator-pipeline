@@ -1,6 +1,6 @@
 use crate::shared_data::SharedData;
-use std::{collections::HashMap, io::Read};
 use serde::Deserialize;
+use std::{collections::HashMap, io::Read};
 
 #[derive(Deserialize, Clone)]
 struct IndividualModuleConfig {
@@ -21,25 +21,27 @@ impl ModuleConfig {
         }
 
         let mut file = std::fs::File::open(path)
-            .unwrap_or_else(|e| panic!(
-                "Failed to read configuration file. Error: {}", e)
-            );
+            .unwrap_or_else(|e| panic!("Failed to read configuration file. Error: {}", e));
 
         let mut config_content = String::new();
         file.read_to_string(&mut config_content);
 
         let config: ModuleConfig = serde_yaml::from_str(&config_content)
-            .unwrap_or_else(|e| panic!(
-            "Failed to parse configuration content. Error: {}", e)
-        );
+            .unwrap_or_else(|e| panic!("Failed to parse configuration content. Error: {}", e));
 
         config
     }
 
     pub fn modules(&self) -> HashMap<String, HashMap<String, String>> {
-        self.modules.clone().into_iter()
-        .map(|module| (module.name, module.parameters))
-        .collect()
+        self.modules
+            .clone()
+            .into_iter()
+            .map(|module| (module.name, module.parameters))
+            .collect()
+    }
+
+    pub fn module_root(&self) -> &String {
+        &self.module_root
     }
 }
 
