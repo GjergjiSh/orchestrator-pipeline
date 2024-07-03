@@ -1,0 +1,9 @@
+host: 127.0.0.1
+port: 5555
+
+publishers:
+  - DebugPub1
+  - DebugPub2
+subscribers:
+  - DebugSub1
+  - DebugSub2
