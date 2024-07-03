@@ -1,5 +1,5 @@
 use crate::module::Module;
-use crate::shared_data::SharedData;
+use crate::shared_data::specification::SharedData;
 
 pub struct Orchestrator {
     modules: Vec<Box<dyn Module>>,

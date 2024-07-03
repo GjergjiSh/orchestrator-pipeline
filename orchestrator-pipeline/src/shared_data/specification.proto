@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+message Motors {
+  int32 left = 1;
+  int32 right = 2;
+}
+
+message SharedData {
+  Motors motors = 1;
+}

@@ -1,4 +1,4 @@
-use crate::shared_data::SharedData;
+use crate::shared_data::specification::SharedData;
 use serde::Deserialize;
 use std::{collections::HashMap, io::Read};
 
