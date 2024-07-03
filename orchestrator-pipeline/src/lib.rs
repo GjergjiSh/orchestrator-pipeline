@@ -4,7 +4,6 @@
 mod shared_data;
 mod orchestrator;
 mod module;
-mod module_loader;
 mod comm;
 
 pub mod prelude;

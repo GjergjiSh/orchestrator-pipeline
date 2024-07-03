@@ -1,6 +1,9 @@
 extern crate libloading;
 
-use crate::module::{Module, ModuleConfig};
+pub mod cfg;
+
+use crate::module::Module;
+use cfg::ModuleConfig;
 use std::{collections::HashMap, path::PathBuf};
 
 static mut LOADED_LIBRARIES: Vec<libloading::Library> = Vec::new();
@@ -37,7 +40,9 @@ fn _load_module(
 
     let lib = unsafe {
         libloading::Library::new(path)
-            .unwrap_or_else(|e| panic!("Failed to load module library at {:?}: {}", path, e))
+            .unwrap_or_else(|e| panic!(
+                "Failed to load module library at {:?}: {}", path, e
+            ))
     };
 
     let constructor: libloading::Symbol<
