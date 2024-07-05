@@ -11,10 +11,10 @@ fn main() {
     let module_config = ModuleConfig::new(cfg_path);
     let connection_config = ConnectionConfig::new(connection_cfg_path);
 
-    let connection = Connection::new(&connection_config);
     let modules = load_modules(&module_config);
 
     let mut orchestrator = Orchestrator::new();
+    let connection = Connection::new(&connection_config);
     for module in modules {
         orchestrator.register_module(module)
     }
