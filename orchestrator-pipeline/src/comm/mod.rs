@@ -17,6 +17,11 @@ pub struct Connection {
 }
 
 impl Connection {
+    //TODO:remove
+    pub fn context(&self) -> &Context {
+        &self.context
+    }
+
     pub fn new(config: &ConnectionConfig) -> Self {
         let publisher_count = config.publishers().len();
         let subscriber_count = config.subscribers().len();
@@ -45,6 +50,10 @@ impl Connection {
             connection.make_sub_socket(topic);
         }
 
+        for (topic, socket) in &connection.publishers {
+            socket.bind("tcp://127.0.0.1:5555");
+        }
+
         connection
     }
 
@@ -59,14 +68,14 @@ impl Connection {
             .unwrap_or_else(|e| panic!("Failed to create PUB socket: {}", e));
 
         socket
-            .connect(&format!("tcp://{}:{}", self.host, self.port))
+            .bind(&format!("tcp://{}:{}", self.host, self.port))
             .unwrap_or_else(|e| panic!("Failed to connect PUB socket: {}", e));
 
         self.publishers.insert(topic.to_string(), socket);
     }
 
     fn make_sub_socket(&mut self, topic: &str) {
-        if self.publishers.contains_key(topic) {
+        if self.subscribers.contains_key(topic) {
             panic!("Duplicate topic for subscriber: {}", topic);
         }
 
@@ -91,14 +100,15 @@ impl Connection {
         let motors = shared_data.motors.as_ref().unwrap();
         let motors_ser = motors.write_to_bytes().unwrap();
         socket.send("Motors", zmq::SNDMORE).unwrap();
-        socket.send(motors_ser, zmq::DONTWAIT).unwrap();
+        socket.send(motors_ser, 0).unwrap();
     }
 
     //TODO: Error handling
-    fn send(&self, shared_data: &SharedData) {
+    pub fn send(&self, shared_data: &SharedData) {
         for (topic, socket) in &self.publishers {
             let pub_function = self.pub_functions.get(topic).unwrap();
             pub_function(&self, socket, shared_data);
+            // println!("Sent data");
         }
     }
 }

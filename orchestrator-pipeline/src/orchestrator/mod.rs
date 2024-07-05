@@ -1,5 +1,6 @@
 use crate::module::Module;
-use crate::shared_data::specification::SharedData;
+use crate::shared_data::specification::{Motors, SharedData};
+use protobuf::MessageField;
 
 pub struct Orchestrator {
     modules: Vec<Box<dyn Module>>,
@@ -8,9 +9,16 @@ pub struct Orchestrator {
 
 impl Orchestrator {
     pub fn new() -> Self {
+        let mut motors = Motors::new();
+        motors.left = 0;
+        motors.right = 0;
+        let mut shared_data = SharedData::new();
+        shared_data.motors = MessageField::some(motors);
+
+
         Orchestrator {
             modules: Vec::new(),
-            shared_data: SharedData::new(),
+            shared_data: shared_data,
         }
     }
 

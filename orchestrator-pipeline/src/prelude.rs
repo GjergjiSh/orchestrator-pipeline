@@ -7,3 +7,4 @@ pub use crate::comm::Connection;
 pub use crate::comm::cfg::ConnectionConfig;
 
 pub use protobuf::Message;
+pub use zmq::{Context, Socket, SUB, PUB, SNDMORE};
