@@ -8,4 +8,4 @@ libloading = "0.8"
 protobuf = "3.5.0"
 serde = { version = "1.0", features = ["derive"] }
 serde_yaml = "0.9"
-# zmq = "0.10.0"
+zmq = "0.10.0"
