@@ -5,3 +5,5 @@ pub use crate::module::module_loader::load_modules;
 pub use crate::module::module_loader::cfg::ModuleConfig;
 pub use crate::comm::Connection;
 pub use crate::comm::cfg::ConnectionConfig;
+
+pub use protobuf::Message;

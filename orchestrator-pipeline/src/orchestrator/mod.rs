@@ -18,9 +18,15 @@ impl Orchestrator {
         self.modules.push(module);
     }
 
-    pub fn trigger_cycle(&self) {
+    pub fn trigger_cycle(&self) -> &SharedData {
         for module in &self.modules {
             module.process(&self.shared_data)
         }
+
+        &self.shared_data
+    }
+
+    pub fn shared_data(&self) -> &SharedData {
+        &self.shared_data
     }
 }
