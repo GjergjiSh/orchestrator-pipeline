@@ -1,6 +1,9 @@
+//TODO: Remove SharedData dependency and send byte vec or String
+//TODO: Check if multiple pubs is even worth it
+
 pub mod cfg;
 
-use crate::{prelude::SharedData, shared_data};
+use crate::prelude::SharedData;
 use cfg::ConnectionConfig;
 use protobuf::Message;
 use std::collections::hash_map::HashMap;
@@ -12,25 +15,20 @@ pub struct Connection {
     host: String,
     publishers: HashMap<String, zmq::Socket>,
     subscribers: HashMap<String, zmq::Socket>,
-    // pub_functions: HashMap<&'static str, fn(&Connection)>,
     pub_functions: HashMap<String, Box<dyn Fn(&Self, &Socket, &SharedData)>>,
 }
 
 impl Connection {
-    //TODO:remove
-    pub fn context(&self) -> &Context {
-        &self.context
-    }
-
     pub fn new(config: &ConnectionConfig) -> Self {
         let publisher_count = config.publishers().len();
         let subscriber_count = config.subscribers().len();
 
-        let mut pub_functions: HashMap<String, Box<dyn Fn(&Self, &Socket, &SharedData)>> = HashMap::with_capacity(publisher_count);
+        let mut pub_functions: HashMap<String, Box<dyn Fn(&Self, &Socket, &SharedData)>> =
+            HashMap::with_capacity(publisher_count);
 
         pub_functions.insert(
             "Motors".to_string(),
-            Box::new(|conn, speed, direction| conn.publish_motors(speed, direction)),
+            Box::new(|conn, socket, shared_data| conn.publish_motors(socket, shared_data)),
         );
 
         let mut connection = Connection {
@@ -48,10 +46,6 @@ impl Connection {
 
         for topic in config.subscribers() {
             connection.make_sub_socket(topic);
-        }
-
-        for (topic, socket) in &connection.publishers {
-            socket.bind("tcp://127.0.0.1:5555");
         }
 
         connection
@@ -108,7 +102,6 @@ impl Connection {
         for (topic, socket) in &self.publishers {
             let pub_function = self.pub_functions.get(topic).unwrap();
             pub_function(&self, socket, shared_data);
-            // println!("Sent data");
         }
     }
 }
