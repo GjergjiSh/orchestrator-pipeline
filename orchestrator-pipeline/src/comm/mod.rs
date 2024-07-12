@@ -3,7 +3,7 @@
 
 pub mod cfg;
 
-use crate::prelude::SharedData;
+use crate::{prelude::SharedData, shared_data::specification::Motors};
 use cfg::ConnectionConfig;
 use protobuf::Message;
 use std::collections::hash_map::HashMap;
@@ -15,6 +15,7 @@ pub struct Connection {
     host: String,
     publishers: HashMap<String, zmq::Socket>,
     subscribers: HashMap<String, zmq::Socket>,
+    sub_functions: HashMap<String, Box<dyn Fn(&Self, &Vec<u8>, &mut SharedData)>>,
     pub_functions: HashMap<String, Box<dyn Fn(&Self, &Socket, &SharedData)>>,
 }
 
@@ -26,9 +27,19 @@ impl Connection {
         let mut pub_functions: HashMap<String, Box<dyn Fn(&Self, &Socket, &SharedData)>> =
             HashMap::with_capacity(publisher_count);
 
+        let mut sub_functions: HashMap<String, Box<dyn Fn(&Self, &Vec<u8>, &mut SharedData)>> =
+            HashMap::with_capacity(subscriber_count);
+
+        //This can be instrumented
         pub_functions.insert(
             "Motors".to_string(),
             Box::new(|conn, socket, shared_data| conn.publish_motors(socket, shared_data)),
+        );
+
+        //This can be instrumented
+        sub_functions.insert(
+            "Motors".to_string(),
+            Box::new(|conn, message, shared_data| conn.recv_motors(message, shared_data)),
         );
 
         let mut connection = Connection {
@@ -38,6 +49,7 @@ impl Connection {
             publishers: HashMap::with_capacity(publisher_count),
             subscribers: HashMap::with_capacity(subscriber_count),
             pub_functions: pub_functions,
+            sub_functions,
         };
 
         for topic in config.publishers() {
@@ -98,10 +110,34 @@ impl Connection {
     }
 
     //TODO: Error handling
+    fn recv_motors(&self, message: &Vec<u8>, shared_data: &mut SharedData) {
+        let new_motor_values = Motors::parse_from_bytes(message).unwrap();
+        let motors = shared_data.motors.as_mut().unwrap();
+        *motors = new_motor_values;
+        dbg!(motors);
+    }
+
+    //TODO: Error handling
     pub fn send(&self, shared_data: &SharedData) {
         for (topic, socket) in &self.publishers {
             let pub_function = self.pub_functions.get(topic).unwrap();
             pub_function(&self, socket, shared_data);
         }
     }
+
+    //TODO: Config for blocking vs non-blocking
+    //TODO: Error handling
+    //TODO: Check if having a hashmap of subs even makes sense
+    pub fn recv(&self, shared_data: &mut SharedData) {
+        for (_, socket) in  &self.subscribers {
+            if let Ok(message) = socket.recv_bytes(zmq::DONTWAIT) {
+                let topic = String::from_utf8_lossy(&message).into_owned();
+                if let Ok(data) = socket.recv_bytes(zmq::DONTWAIT) {
+                    let sub_function = self.sub_functions.get(&topic).unwrap();
+                    sub_function(&self, &data, shared_data);
+                }
+            }
+        }
+    }
+
 }

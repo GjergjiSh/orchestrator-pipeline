@@ -37,4 +37,9 @@ impl Orchestrator {
     pub fn shared_data(&self) -> &SharedData {
         &self.shared_data
     }
+
+    pub fn mut_shared_data(&mut self) -> &mut SharedData {
+        &mut self.shared_data
+    }
+
 }

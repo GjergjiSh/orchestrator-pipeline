@@ -23,5 +23,7 @@ fn main() {
     loop {
         let shared_data = orchestrator.trigger_cycle();
         connection.send(shared_data);
+        let mut shared_data = orchestrator.mut_shared_data();
+        connection.recv(shared_data)
     }
 }
